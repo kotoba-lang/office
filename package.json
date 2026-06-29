@@ -1,11 +1,11 @@
 {
-  "name": "@com-junkawasaki/office-causal",
+  "name": "@kotoba-lang/office",
   "version": "0.1.0",
   "description": "Parse MS Office (OOXML: pptx/xlsx/docx) into a single typed causal graph, with deterministic data-id + meta and a LangGraph.js causal-analysis agent.",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "office-causal": "dist/src/cli.js"
+    "office": "dist/src/cli.js"
   },
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -28,11 +28,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/com-junkawasaki/office-causal.git"
+    "url": "git+https://github.com/kotoba-lang/office.git"
   },
-  "homepage": "https://github.com/com-junkawasaki/office-causal#readme",
+  "homepage": "https://github.com/kotoba-lang/office#readme",
   "bugs": {
-    "url": "https://github.com/com-junkawasaki/office-causal/issues"
+    "url": "https://github.com/kotoba-lang/office/issues"
   },
   "publishConfig": {
     "access": "public",

@@ -24,15 +24,22 @@
    bs
    (into-array java.nio.file.OpenOption [])))
 
+(defn- require-file [file]
+  (when-not file
+    (throw (ex-info (usage) {})))
+  file)
+
 (defn -main [& args]
   (try
     (case (first args)
       "read" (let [[_ file] args
+                   file (require-file file)
                    pkg (opc/open-package (read-bytes file))]
                (prn {:office/kind (:office/kind pkg)
                      :office/entries (count (:office/entries pkg))
                      :office/parts (mapv :office/path (opc/office-parts pkg))}))
       "graph" (let [[_ file fmt] args
+                    file (require-file file)
                     g (graph/analyze-bytes (read-bytes file))]
                 (println (export/export g (keyword (or fmt "edn")))))
       "embed" (let [[_ file out] args]

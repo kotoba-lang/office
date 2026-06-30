@@ -8,6 +8,14 @@ Pure CLJC / EDN runtime for Microsoft Office Open XML packages.
 OOXML parts into a portable EDN graph, and can embed that graph back into the
 package as `ocz/causal.edn` without rewriting the existing Office XML parts.
 
+The reader keeps text entries as EDN-friendly strings, decodes common named and
+numeric XML text entities, extracts attribute-bearing PowerPoint text runs,
+orders numbered Office parts naturally, preserves non-text zip entries for
+round-trip writes, tolerates malformed direct part graph inputs, escapes
+DOT/GraphML/SVG inspection output, and embeds payload metadata idempotently even
+when package metadata starts as self-closing XML or uses single-quoted
+attributes.
+
 ## Runtime
 
 - Implementation: Clojure / ClojureScript portable `.cljc`
@@ -65,3 +73,10 @@ npx @kotoba-lang/office read deck.pptx
 ```bash
 clojure -X:test
 ```
+
+The test suite covers package kind detection, pptx/xlsx/docx text extraction,
+natural Office part ordering, common XML entity decoding, attribute-bearing
+PowerPoint text runs, malformed direct part graph fallbacks, non-destructive
+package round-trip behavior, CLI commands, payload embedding, DOT/GraphML/SVG escaping, missing package metadata
+fallbacks, and idempotent content type / relationship updates across single- or
+double-quoted attributes.

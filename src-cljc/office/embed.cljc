@@ -8,6 +8,12 @@
 (def payload-part "ocz/causal.edn")
 (def payload-version 1)
 
+(defn- attr-present? [xml k v]
+  (boolean
+   (re-find (re-pattern (str "\\b" k "=(['\"])" #?(:clj (java.util.regex.Pattern/quote v)
+                                                   :cljs v) "\\1"))
+            (or xml ""))))
+
 (defn payload [g]
   {:office/version payload-version
    :office/generator "kotoba-lang/office"
@@ -15,7 +21,13 @@
 
 (defn- ensure-content-type [xml]
   (cond
-    (str/includes? (or xml "") "Extension=\"edn\"") xml
+    (str/blank? (or xml ""))
+    "<Types><Default Extension=\"edn\" ContentType=\"application/edn\"/></Types>"
+
+    (attr-present? xml "Extension" "edn") xml
+    (re-find #"<Types\b([^>]*)/>" (or xml ""))
+    (str/replace xml #"<Types\b([^>]*)/>"
+                 "<Types$1><Default Extension=\"edn\" ContentType=\"application/edn\"/></Types>")
     (str/includes? (or xml "") "</Types>")
     (str/replace xml #"</Types>\s*$"
                  "<Default Extension=\"edn\" ContentType=\"application/edn\"/></Types>")
@@ -23,7 +35,17 @@
 
 (defn- ensure-root-rels [xml]
   (cond
-    (str/includes? (or xml "") "rIdKotobaOffice") xml
+    (str/blank? (or xml ""))
+    (str "<Relationships><Relationship Id=\"rIdKotobaOffice\" "
+         "Type=\"https://kotoba-lang.org/office/relationship/causal-edn\" "
+         "Target=\"" payload-part "\"/></Relationships>")
+
+    (attr-present? xml "Id" "rIdKotobaOffice") xml
+    (re-find #"<Relationships\b([^>]*)/>" (or xml ""))
+    (str/replace xml #"<Relationships\b([^>]*)/>"
+                 (str "<Relationships$1><Relationship Id=\"rIdKotobaOffice\" "
+                      "Type=\"https://kotoba-lang.org/office/relationship/causal-edn\" "
+                      "Target=\"" payload-part "\"/></Relationships>"))
     (str/includes? (or xml "") "</Relationships>")
     (str/replace xml #"</Relationships>\s*$"
                  (str "<Relationship Id=\"rIdKotobaOffice\" "

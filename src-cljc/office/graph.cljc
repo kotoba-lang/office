@@ -14,22 +14,53 @@
    :office/to to
    :office/edge kind})
 
+(defn- safe-name [x]
+  (if x (name x) "unknown"))
+
+(defn- parse-int-radix [s radix]
+  #?(:clj (Integer/parseInt s radix)
+     :cljs (js/parseInt s radix)))
+
+(defn- codepoint-string [n]
+  #?(:clj (String. (Character/toChars n))
+     :cljs (.fromCodePoint js/String n)))
+
+(defn- decode-numeric-entity [[raw hex dec]]
+  (try
+    (let [n (if hex
+              (parse-int-radix hex 16)
+              (parse-int-radix dec 10))]
+      (codepoint-string n))
+    (catch #?(:clj Exception :cljs :default) _
+      raw)))
+
+(defn- xml-text [x]
+  (-> (str (or x ""))
+      (str/replace #"&#x([0-9A-Fa-f]+);|&#([0-9]+);" decode-numeric-entity)
+      (str/replace "&lt;" "<")
+      (str/replace "&gt;" ">")
+      (str/replace "&quot;" "\"")
+      (str/replace "&apos;" "'")
+      (str/replace "&amp;" "&")))
+
 (defn- text-runs [xml]
-  (->> (re-seq #"<a:t>([^<]*)</a:t>|<w:t[^>]*>([^<]*)</w:t>|<t[^>]*>([^<]*)</t>" xml)
+  (->> (re-seq #"<a:t[^>]*>([^<]*)</a:t>|<w:t[^>]*>([^<]*)</w:t>|<t[^>]*>([^<]*)</t>" (or xml ""))
        (map (fn [[_ a b c]] (or a b c)))
+       (map xml-text)
        (remove str/blank?)
        vec))
 
 (defn- part-kind [path]
-  (cond
+  (let [path (str (or path ""))]
+    (cond
     (str/starts-with? path "ppt/slides/") :slide
     (str/starts-with? path "xl/worksheets/") :sheet
     (= path "word/document.xml") :document
-    :else :part))
+      :else :part)))
 
 (defn part-graph [part]
-  (let [path (:office/path part)
-        xml (:office/xml part)
+  (let [path (or (:office/path part) "unknown-part")
+        xml (or (:office/xml part) "")
         id path
         texts (text-runs xml)
         text-nodes (map-indexed
@@ -47,7 +78,7 @@
 (defn package-graph [pkg]
   (let [parts (opc/office-parts pkg)
         graphs (map part-graph parts)
-        root (node "package" (:office/kind pkg) (name (:office/kind pkg)) {})]
+        root (node "package" (or (:office/kind pkg) :unknown) (safe-name (:office/kind pkg)) {})]
     {:office/kind (:office/kind pkg)
      :office/nodes (vec (cons root (mapcat :office/nodes graphs)))
      :office/edges (vec (concat

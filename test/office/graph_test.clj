@@ -1,7 +1,10 @@
 (ns office.graph-test
   (:require [clojure.test :refer [deftest is]]
+            [office.embed :as embed]
+            [office.export :as export]
             [office.graph :as graph]
-            [office.opc :as opc])
+            [office.opc :as opc]
+            [office.visual :as visual])
   (:import [java.io ByteArrayOutputStream]
            [java.util.zip ZipEntry ZipOutputStream]))
 
@@ -25,3 +28,20 @@
            (->> (:office/nodes g)
                 (filter #(= :text (:office/kind %)))
                 (map :office/text))))))
+
+(deftest embeds-edn-graph-non-destructively
+  (let [bytes (zip-bytes {"[Content_Types].xml" "<Types/>"
+                          "_rels/.rels" "<Relationships/>"
+                          "ppt/slides/slide1.xml" "<p:sld><a:t>Hello</a:t></p:sld>"})
+        out (embed/embed-bytes bytes)
+        pkg (opc/open-package out)
+        payload (embed/read-payload pkg)
+        g (embed/read-graph pkg)]
+    (is (= 1 (:office/version payload)))
+    (is (contains? (:office/entries pkg) "ocz/causal.edn"))
+    (is (= "Hello" (->> (:office/nodes g)
+                        (filter #(= :text (:office/kind %)))
+                        first
+                        :office/text)))
+    (is (re-find #"digraph office" (export/export g :dot)))
+    (is (re-find #"<svg" (visual/graph-svg g)))))

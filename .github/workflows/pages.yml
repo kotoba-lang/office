@@ -1,6 +1,6 @@
 name: Pages
 
-# GitHub Pages: ランディング(docs/site) + ブラウザ WebGPU デモ(web/) を公開する。
+# GitHub Pages: static documentation site.
 # Settings → Pages → Source を "GitHub Actions" にしておくこと
 # (gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow で有効化済み)。
 
@@ -24,24 +24,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      # Vite(rolldown) のネイティブ binding が optionalDependencies のため --omit=optional 不可。
-      # @huggingface/transformers は optional だが CDN external でバンドルされない。
-      - run: npm ci
-      # Svelte/Vite デモは dist/src/* (ライブラリビルド成果) を import するため先に build が必要
-      - name: Build library (→ dist/)
-        run: npm run build
-      - name: Build web demo (Vite/Svelte → web/dist/)
-        run: npm run build:web
       - name: Assemble site
         run: |
           mkdir -p _site
-          cp -r docs/site/. _site/     # ランディング(index.html) + examples/*.svg
-          mkdir -p _site/demo
-          cp -r web/dist/. _site/demo/ # Vite ビルド成果 (Svelte デモ)
+          cp -r docs/site/. _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -1,266 +1,41 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>office-causal — OOXML → typed causal graph</title>
-    <meta name="description" content="Turn all the XML inside MS Office (pptx/xlsx/docx) into a single typed causal graph in TypeScript — stable data-id + meta on every element, deterministic structure, local WebGPU LLM causal adjudication, tensor-network corpus." />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: "media",
-        theme: {
-          extend: {
-            colors: { accent: { DEFAULT: "#0071e3", dark: "#2997ff" }, ink: "#1d1d1f", ink2: "#6e6e73" },
-            fontFamily: {
-              sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Helvetica Neue", "Hiragino Sans", "Noto Sans JP", "sans-serif"],
-              mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
-            },
-            boxShadow: { card: "0 1px 2px rgba(0,0,0,0.04), 0 12px 32px rgba(0,0,0,0.06)" },
-          },
-        },
-      };
-    </script>
-    <style type="text/tailwindcss">
-      @layer base {
-        body { @apply bg-[#fbfbfd] font-sans text-ink antialiased dark:bg-black dark:text-[#f5f5f7]; }
-        code:not(pre code) { @apply rounded-md bg-black/[0.06] px-1.5 py-0.5 font-mono text-[0.85em] dark:bg-white/[0.1]; }
-      }
-      @layer components {
-        .wrap { @apply mx-auto w-full max-w-5xl px-5; }
-        .card { @apply rounded-3xl border border-black/[0.06] bg-white/80 p-6 shadow-card backdrop-blur transition duration-200 dark:border-white/[0.08] dark:bg-white/[0.04]; }
-        .card-hover { @apply hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.05),0_20px_48px_rgba(0,0,0,0.1)]; }
-        .btn { @apply inline-flex items-center justify-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-[0.97]; }
-        .btn-primary { @apply bg-accent text-white hover:bg-[#0077ed] dark:bg-accent-dark dark:text-black; }
-        .btn-ghost { @apply border border-black/10 bg-white/70 text-ink hover:bg-black/[0.03] dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:bg-white/10; }
-        .eyebrow { @apply text-[13px] font-semibold uppercase tracking-[0.06em] text-accent dark:text-accent-dark; }
-        .h2 { @apply mt-2 text-[28px] font-semibold leading-tight tracking-tight sm:text-[34px]; }
-        .lead { @apply text-[17px] leading-[1.65] text-ink2 dark:text-[#a1a1a6]; }
-        pre { @apply overflow-auto rounded-2xl bg-[#0b0f17] p-5 text-[12.5px] leading-relaxed text-[#d7e3f4] ring-1 ring-white/5; }
-        .pill { @apply inline-flex items-center gap-1 rounded-full bg-black/[0.05] px-2.5 py-1 text-[12px] font-medium text-ink2 dark:bg-white/[0.08] dark:text-[#a1a1a6]; }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- nav -->
-    <header class="sticky top-0 z-50 border-b border-black/[0.06] bg-[#fbfbfd]/80 backdrop-blur-xl dark:border-white/[0.08] dark:bg-black/70">
-      <nav class="wrap flex h-12 items-center justify-between">
-        <a href="#top" class="text-[15px] font-semibold tracking-tight">office-causal</a>
-        <div class="hidden items-center gap-6 text-[13px] text-ink2 dark:text-[#a1a1a6] sm:flex">
-          <a href="#what" class="transition hover:text-ink dark:hover:text-white">Overview</a>
-          <a href="#start" class="transition hover:text-ink dark:hover:text-white">Quick start</a>
-          <a href="#examples" class="transition hover:text-ink dark:hover:text-white">Examples</a>
-          <a href="#tensor" class="transition hover:text-ink dark:hover:text-white">Tensor network</a>
-          <a href="#adr" class="transition hover:text-ink dark:hover:text-white">Design</a>
-        </div>
-        <div class="flex items-center gap-2">
-          <a class="btn btn-ghost !px-3.5 !py-1.5" href="https://github.com/com-junkawasaki/office-causal">GitHub</a>
-          <a class="btn btn-primary !px-3.5 !py-1.5" href="./demo/">Demo</a>
-        </div>
-      </nav>
-    </header>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>kotoba-lang/office</title>
+  <style>
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:#f7f8fb;color:#17202a}
+    main{max-width:920px;margin:0 auto;padding:48px 20px}
+    h1{font-size:40px;line-height:1.08;margin:0 0 14px}
+    p{color:#526170;line-height:1.6;max-width:760px}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#657f3d}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:28px 0}
+    .item{background:white;border:1px solid #d8dee8;border-radius:8px;padding:16px}
+    .item b{display:block;margin-bottom:8px}
+    pre{background:#101725;color:#d7e3f4;border-radius:8px;padding:16px;overflow:auto}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>kotoba-lang/office</h1>
+    <p>Pure CLJC / EDN runtime for Office Open XML packages. It reads
+      <code>.pptx</code>, <code>.xlsx</code>, and <code>.docx</code>, extracts
+      deterministic graph data, and embeds that graph back as
+      <code>ocz/causal.edn</code> without a JavaScript runtime.</p>
+    <section class="grid">
+      <div class="item"><b>office.opc</b>OOXML zip read/write with raw round-trip preservation.</div>
+      <div class="item"><b>office.graph</b>Portable EDN graph from document, slide, sheet, and text parts.</div>
+      <div class="item"><b>office.embed</b>Non-destructive EDN payload embedding.</div>
+      <div class="item"><b>office.export</b>EDN, DOT, GraphML, and compact SVG inspection.</div>
+    </section>
+    <pre>(require '[office.opc :as opc]
+         '[office.graph :as graph]
+         '[office.embed :as embed])
 
-    <main id="top">
-      <!-- hero -->
-      <section class="relative overflow-hidden">
-        <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[460px] bg-gradient-to-b from-accent/[0.08] to-transparent dark:from-accent-dark/[0.12]"></div>
-        <div class="wrap pt-20 pb-14 text-center sm:pt-28 sm:pb-20">
-          <p class="eyebrow">OOXML · TypeScript · local WebGPU</p>
-          <h1 class="mx-auto mt-3 max-w-3xl text-[40px] font-semibold leading-[1.05] tracking-tight sm:text-[60px]">
-            All the XML inside Office,<br class="hidden sm:block" /> as one
-            <span class="bg-gradient-to-r from-accent to-[#7d5cff] bg-clip-text text-transparent dark:from-accent-dark dark:to-[#a78bfa]">typed causal graph</span>.
-          </h1>
-          <p class="lead mx-auto mt-5 max-w-2xl text-[19px]">
-            Attach a stable <code>data-id</code> + <code>meta</code> to every pptx / xlsx / docx element, then lift it from
-            structure → reference → <b class="text-ink dark:text-white">causal</b> — all on-device, no API key.
-          </p>
-          <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a class="btn btn-primary px-6 py-3 text-[15px]" href="./demo/">▶&nbsp; Live WebGPU demo</a>
-            <a class="btn btn-ghost px-6 py-3 text-[15px]" href="https://github.com/com-junkawasaki/office-causal">View on GitHub</a>
-          </div>
-          <div class="mt-8 flex flex-wrap items-center justify-center gap-2.5">
-            <a href="https://github.com/com-junkawasaki/office-causal/actions/workflows/ci.yml"><img class="h-5" src="https://github.com/com-junkawasaki/office-causal/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-            <a href="https://github.com/com-junkawasaki/office-causal/pkgs/npm/office-causal"><img class="h-5" src="https://img.shields.io/badge/GitHub%20Packages-%40com--junkawasaki%2Foffice--causal-2188ff?logo=github" alt="GitHub Packages" /></a>
-            <a href="https://github.com/com-junkawasaki/office-causal/blob/main/LICENSE"><img class="h-5" src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT" /></a>
-            <a class="pill" href="https://github.com/com-junkawasaki/office-causal/blob/main/README.ja.md">日本語 README →</a>
-          </div>
-        </div>
-      </section>
-
-      <!-- what it does -->
-      <section id="what" class="wrap scroll-mt-16 py-16">
-        <p class="eyebrow">What it does</p>
-        <h2 class="h2">Office documents hide implicit causal structure.</h2>
-        <p class="lead mt-4 max-w-3xl">
-          A cell <code>B2 = A2*1.1</code> <i>depends on</i> <code>A2</code>; a slide claims a share decline was
-          <i>caused by</i> a competitor's price cut. office-causal unifies these into one directed graph and decides
-          direction with a local model — keeping results reproducible, cheap and auditable.
-        </p>
-        <div class="mt-6 overflow-auto rounded-2xl border border-black/[0.06] bg-white/60 p-5 font-mono text-[12.5px] leading-relaxed text-ink2 dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-[#a1a1a6]">
-          ingest → identify (data-id+meta) → structural (contains / references / derives-from)<br />
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; → embed (local model) → semantic → <span class="text-accent dark:text-accent-dark">causal (direction / polarity)</span> → verify
-        </div>
-
-        <div class="mt-8 grid gap-4 sm:grid-cols-2">
-          <div class="card card-hover">
-            <h3 class="text-[17px] font-semibold">Typed causal graph</h3>
-            <p class="lead mt-2 text-[15px]">Edges = <code>contains</code> / <code>references</code> / <code>derives-from</code> / <code>mentions</code> / <code>causes</code>. Every <code>causes</code> edge carries evidence + a mechanism and passes hypothesis → supported/refuted.</p>
-          </div>
-          <div class="card card-hover">
-            <h3 class="text-[17px] font-semibold">Stable data-id</h3>
-            <p class="lead mt-2 text-[15px]">Content-addressed ids survive Office re-saves. Embed the whole graph back into the file non-destructively as <code>.ocz.pptx</code> — still valid OOXML, opens normally.</p>
-          </div>
-          <div class="card card-hover">
-            <h3 class="text-[17px] font-semibold">Local &amp; private</h3>
-            <p class="lead mt-2 text-[15px]">Cloud-free edge-LLM: encoder embeddings → local <b class="text-ink dark:text-white">Gemma 4</b> (WebGPU) adjudicates direction/polarity and runs the adversarial verify. No API key, no upload.</p>
-          </div>
-          <div class="card card-hover">
-            <h3 class="text-[17px] font-semibold">Diagnose &amp; consult</h3>
-            <p class="lead mt-2 text-[15px]">Mechanically find isolated nodes, refuted edges, notation variants and concept jumps; walk causal chains for so-what implications + MECE checks.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- quick start -->
-      <section id="start" class="scroll-mt-16 border-y border-black/[0.06] bg-white/50 py-16 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <div class="wrap">
-          <p class="eyebrow">Quick start</p>
-          <h2 class="h2">Three ways in.</h2>
-
-          <div class="mt-8 space-y-8">
-            <div>
-              <h3 class="flex items-center gap-2 text-[17px] font-semibold"><span class="pill">1</span> Try it now — no install</h3>
-              <p class="lead mt-2 text-[15px]">Open the <a class="font-medium text-accent dark:text-accent-dark" href="./demo/">live WebGPU demo</a> in Chrome/Edge, drop a <code>.xlsx/.pptx/.docx</code>, then Run → 🔍 diagnose → 💡 so-what/MECE. Everything runs in the browser.</p>
-            </div>
-            <div>
-              <h3 class="flex items-center gap-2 text-[17px] font-semibold"><span class="pill">2</span> Use it as a library</h3>
-<pre class="mt-3"><code># configure the scope registry + auth in your project .npmrc
-echo "@com-junkawasaki:registry=https://npm.pkg.github.com" >> .npmrc
-echo "//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" >> .npmrc   # PAT with read:packages
-
-npm install @com-junkawasaki/office-causal</code></pre>
-<pre class="mt-3"><code>import { analyze, embedFile, readDataPart, toTensorNetwork } from "@com-junkawasaki/office-causal";
-
-// fully local, Gemma 4 only (no cloud). Node: device "cpu"; browser: "webgpu".
-const graph = await analyze("report.pptx", { llm: { device: "cpu", verify: false } });
-await embedFile("report.xlsx", { mode: "part" });          // → report.ocz.xlsx (valid OOXML)
-const tn = toTensorNetwork(graph);                          // → 4-layer tensor network</code></pre>
-            </div>
-            <div>
-              <h3 class="flex items-center gap-2 text-[17px] font-semibold"><span class="pill">3</span> Use the CLI</h3>
-<pre class="mt-3"><code>office-causal analyze  report.pptx                  # → CausalGraph (JSON)
-office-causal embed    report.pptx --analysis      # → report.ocz.pptx (graph + analysis)
-office-causal diagnose report.ocz.pptx --gemma     # isolated / not-holding / notation / concept-jumps
-office-causal consult  report.ocz.pptx --mece --svg sowhat.svg</code></pre>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- examples -->
-      <section id="examples" class="wrap scroll-mt-16 py-16">
-        <p class="eyebrow">Output examples</p>
-        <h2 class="h2">Diagnosis SVG — layout adapts to the source.</h2>
-        <p class="lead mt-4 max-w-3xl">
-          <code>diagnose --svg out.svg</code> renders a self-contained annotated SVG: docx/text uses a topological-DAG layout,
-          xlsx places cells on the <code>Sheet!A1</code> grid, pptx reproduces the slide via shape <code>bbox</code>.
-          <span class="text-[#2a8a2a] dark:text-[#48c774]">green = holds</span>,
-          <span class="text-[#d22] dark:text-[#ff6b6b]">red dashed = not-holding</span>; <code>+/-</code> = polarity; gray = isolated.
-        </p>
-        <div class="mt-6 grid gap-4 sm:grid-cols-3">
-          <figure class="card card-hover overflow-hidden !p-0">
-            <a href="./examples/diagnosis-docx.svg"><img class="h-52 w-full bg-white object-contain p-2" src="./examples/diagnosis-docx.svg" alt="docx diagnosis SVG — DAG layout" loading="lazy" /></a>
-            <figcaption class="border-t border-black/[0.06] px-4 py-3 text-[13px] text-ink2 dark:border-white/[0.08] dark:text-[#a1a1a6]"><b class="text-ink dark:text-white">docx / text</b> — topological DAG (layering + spread + edge routing)</figcaption>
-          </figure>
-          <figure class="card card-hover overflow-hidden !p-0">
-            <a href="./examples/diagnosis-xlsx.svg"><img class="h-52 w-full bg-white object-contain p-2" src="./examples/diagnosis-xlsx.svg" alt="xlsx diagnosis SVG — cell grid" loading="lazy" /></a>
-            <figcaption class="border-t border-black/[0.06] px-4 py-3 text-[13px] text-ink2 dark:border-white/[0.08] dark:text-[#a1a1a6]"><b class="text-ink dark:text-white">xlsx</b> — <code>Sheet!A1</code> cell grid</figcaption>
-          </figure>
-          <figure class="card card-hover overflow-hidden !p-0">
-            <a href="./examples/diagnosis-pptx.svg"><img class="h-52 w-full bg-white object-contain p-2" src="./examples/diagnosis-pptx.svg" alt="pptx diagnosis SVG — slide bbox" loading="lazy" /></a>
-            <figcaption class="border-t border-black/[0.06] px-4 py-3 text-[13px] text-ink2 dark:border-white/[0.08] dark:text-[#a1a1a6]"><b class="text-ink dark:text-white">pptx</b> — shape <code>bbox</code> (slide layout)</figcaption>
-          </figure>
-        </div>
-      </section>
-
-      <!-- tensor network -->
-      <section id="tensor" class="scroll-mt-16 border-y border-black/[0.06] bg-white/50 py-16 dark:border-white/[0.08] dark:bg-white/[0.02]">
-        <div class="wrap">
-          <p class="eyebrow">Tensor network</p>
-          <h2 class="h2">A whole corpus as one 4-layer tensor network.</h2>
-          <p class="lead mt-4 max-w-3xl">
-            <b class="text-ink dark:text-white">Document → Page</b> (slide/sheet/section) <b class="text-ink dark:text-white">→ Object</b> (shape/cell/paragraph) <b class="text-ink dark:text-white">→ Causal</b> (entity/claim).
-            Each node is a tensor, each edge a bond (<code>contains</code>/<code>references</code>/<code>mentions</code>/<code>causes</code>; <code>causes</code> carry χ=3 for polarity).
-            <code>causes</code> and same-concept <code>references</code> link entities <i>across documents</i>, so a single causal cluster spans the corpus.
-          </p>
-          <div class="mt-6 flex flex-wrap gap-2">
-            <span class="pill">3 pptx × 10 slides</span>
-            <span class="pill">3 docx × 3 pages</span>
-            <span class="pill">3 xlsx × 3 sheets</span>
-            <span class="pill">210 nodes · 339 bonds</span>
-            <span class="pill">1 causal component</span>
-            <span class="pill">5 cross-doc causes</span>
-          </div>
-          <figure class="card mt-6 overflow-hidden !p-0">
-            <a href="./examples/tensor-network.svg"><img class="w-full bg-white" src="./examples/tensor-network.svg" alt="4-layer tensor network of the sample corpus" loading="lazy" /></a>
-            <figcaption class="border-t border-black/[0.06] px-4 py-3 text-[13px] text-ink2 dark:border-white/[0.08] dark:text-[#a1a1a6]">4-layer tensor network (wide — click to open full SVG). Bands top→bottom: Document / Page / Object / Causal. Bottom band shows cross-document <code>causes</code> arcs.</figcaption>
-          </figure>
-          <p class="lead mt-4 text-[15px]">
-            Generate it: <code>npm run build &amp;&amp; npm run gen:sample-data</code> → writes the OOXML files, <code>corpus.graph.json</code>, <code>tensor-network.json</code> and this SVG.
-            Source: <a class="font-medium text-accent dark:text-accent-dark" href="https://github.com/com-junkawasaki/office-causal/tree/main/examples/sample-data">examples/sample-data</a> · API: <code>toTensorNetwork(graph)</code> / <code>renderTensorNetworkSvg(tn)</code>.
-          </p>
-        </div>
-      </section>
-
-      <!-- tiering -->
-      <section class="wrap scroll-mt-16 py-16">
-        <p class="eyebrow">Edge-LLM tiering · cloud-free</p>
-        <h2 class="h2">Only meaning needs a model — and it's on-device.</h2>
-        <div class="card mt-6 overflow-hidden !p-0">
-          <table class="w-full border-collapse text-[14px]">
-            <thead class="bg-black/[0.03] text-left dark:bg-white/[0.04]">
-              <tr>
-                <th class="px-5 py-3 font-semibold">Role</th>
-                <th class="px-5 py-3 font-semibold">Model class</th>
-                <th class="px-5 py-3 font-semibold">Job</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-black/[0.06] dark:divide-white/[0.08]">
-              <tr>
-                <td class="px-5 py-3 font-medium">① embedding</td>
-                <td class="px-5 py-3 text-ink2 dark:text-[#a1a1a6]">encoder (transformers.js)</td>
-                <td class="px-5 py-3 text-ink2 dark:text-[#a1a1a6]">edge weight · data-id tags · causal candidate shortlisting</td>
-              </tr>
-              <tr>
-                <td class="px-5 py-3 font-medium">② generation</td>
-                <td class="px-5 py-3 text-ink2 dark:text-[#a1a1a6]">Gemma 4 E2B/E4B (local, WebGPU/WASM/CPU)</td>
-                <td class="px-5 py-3 text-ink2 dark:text-[#a1a1a6]">adjudicate causal direction / polarity / mechanism · adversarial verify</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- adr -->
-      <section id="adr" class="wrap scroll-mt-16 pb-16">
-        <p class="eyebrow">Design decisions</p>
-        <h2 class="h2">ADRs.</h2>
-        <div class="mt-6 grid gap-3 sm:grid-cols-2">
-          <a class="card card-hover block" href="https://github.com/com-junkawasaki/office-causal/blob/main/docs/adr/0001-causal-graph-ir.md"><b>ADR-0001</b><span class="lead mt-1 block text-[14px]">Single CausalGraph IR · deterministic-vs-LLM split · content-addressed data-id · evidence-required causal edges</span></a>
-          <a class="card card-hover block" href="https://github.com/com-junkawasaki/office-causal/blob/main/docs/adr/0002-local-embeddings.md"><b>ADR-0002</b><span class="lead mt-1 block text-[14px]">transformers.js local embeddings for edge weights &amp; tagging</span></a>
-          <a class="card card-hover block" href="https://github.com/com-junkawasaki/office-causal/blob/main/docs/adr/0003-edge-llm-tiering.md"><b>ADR-0003</b><span class="lead mt-1 block text-[14px]">Edge-LLM tiering (embedding → local Gemma 4/WebGPU adjudication + verify), cloud-free</span></a>
-          <a class="card card-hover block" href="https://github.com/com-junkawasaki/office-causal/blob/main/docs/adr/0004-ooxml-embedding.md"><b>ADR-0004</b><span class="lead mt-1 block text-[14px]">Non-destructive OOXML embedding (OPC part / attrs / bookmarks / JSONL / diff / deep-link)</span></a>
-          <a class="card card-hover block" href="https://github.com/com-junkawasaki/office-causal/blob/main/docs/adr/0005-tensor-network.md"><b>ADR-0005</b><span class="lead mt-1 block text-[14px]">Corpus as a 4-layer tensor network — Document → Page → Object → Causal, bonds with χ, cross-document causes</span></a>
-          <a class="card card-hover block" href="https://github.com/com-junkawasaki/office-causal/blob/main/docs/adr/0006-browser-demo-stack.md"><b>ADR-0006</b><span class="lead mt-1 block text-[14px]">Browser demo on Svelte + Vite + GitHub Pages; transparent WebGPU→WASM; transformers external via importmap</span></a>
-        </div>
-      </section>
-    </main>
-
-    <footer class="border-t border-black/[0.06] py-10 dark:border-white/[0.08]">
-      <div class="wrap flex flex-col items-start justify-between gap-3 text-[13px] text-ink2 dark:text-[#86868b] sm:flex-row sm:items-center">
-        <p>org <code>com-junkawasaki</code> · sibling <b class="text-ink dark:text-white">svgraph</b> (DrawingML → SVG) · MIT License</p>
-        <a class="font-medium text-accent dark:text-accent-dark" href="https://github.com/com-junkawasaki/office-causal">github.com/com-junkawasaki/office-causal</a>
-      </div>
-    </footer>
-  </body>
+(def pkg (opc/open-package bytes))
+(def g (graph/package-graph pkg))
+(def out (embed/embed-bytes bytes))</pre>
+  </main>
+</body>
 </html>

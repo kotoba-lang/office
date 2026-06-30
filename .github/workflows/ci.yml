@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  cljc:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,22 +20,3 @@ jobs:
           cli: latest
       - name: Test CLJC
         run: clojure -X:test
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      # Vite(rolldown) はプラットフォーム固有のネイティブ binding を optionalDependencies
-      # として持つため --omit=optional は使えない (binding が入らず vite build が失敗)。
-      # @huggingface/transformers も optional だが CDN external なのでバンドルされない。
-      - run: npm ci
-      - name: Typecheck (library)
-        run: npm run check
-      - name: Build (library)
-        run: npm run build
-      - name: Build (web demo · Vite/Svelte)
-        run: npm run build:web

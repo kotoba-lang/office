@@ -13,7 +13,8 @@ package as `ocz/causal.edn` without rewriting the existing Office XML parts.
 - Implementation: Clojure / ClojureScript portable `.cljc`
 - Host zip support: JVM Clojure for package read/write
 - Data surface: EDN maps under `:office/*`
-- JavaScript / TypeScript runtime: none
+- JavaScript / TypeScript core runtime: none. The npm package only provides a
+  thin `node` bin wrapper that invokes the Clojure CLI.
 
 ## API
 
@@ -44,6 +45,20 @@ package as `ocz/causal.edn` without rewriting the existing Office XML parts.
 - `office.embed`: non-destructive `ocz/causal.edn` payload embedding
 - `office.export`: EDN, DOT, and GraphML export
 - `office.visual`: compact SVG graph inspection
+
+## CLI / npm
+
+The CLI works directly with Clojure or through the npm wrapper. In both cases
+`clojure` must be installed on the host.
+
+```bash
+clojure -M:cli read deck.pptx
+clojure -M:cli graph deck.pptx dot
+clojure -M:cli embed deck.pptx deck.ocz.pptx
+clojure -M:cli svg deck.pptx graph.svg
+
+npx @kotoba-lang/office read deck.pptx
+```
 
 ## Test
 

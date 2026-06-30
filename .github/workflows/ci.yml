@@ -18,5 +18,10 @@ jobs:
       - uses: DeLaGuardo/setup-clojure@13.4
         with:
           cli: latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Test CLJC
         run: clojure -X:test
+      - name: Smoke npm bin wrapper
+        run: node bin/kotoba-office.js

@@ -1,0 +1,18 @@
+{
+  "name": "@kotoba-lang/office",
+  "version": "0.1.0",
+  "description": "CLJC OOXML reader, EDN graph extractor, and non-destructive Office payload embedder.",
+  "license": "MIT",
+  "bin": {
+    "kotoba-office": "bin/kotoba-office.js"
+  },
+  "files": [
+    "bin",
+    "src-cljc",
+    "deps.edn",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "clojure -X:test"
+  }
+}

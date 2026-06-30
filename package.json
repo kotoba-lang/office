@@ -4,7 +4,10 @@
   "description": "CLJC OOXML reader, EDN graph extractor, and non-destructive Office payload embedder.",
   "license": "MIT",
   "bin": {
-    "kotoba-office": "bin/kotoba-office.js"
+    "kotoba-office": "bin/kotoba-office.cljs"
+  },
+  "dependencies": {
+    "nbb": "^1.3.204"
   },
   "files": [
     "bin",

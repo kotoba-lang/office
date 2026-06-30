@@ -23,5 +23,7 @@ jobs:
           node-version: 20
       - name: Test CLJC
         run: clojure -X:test
+      - name: Test npm package script
+        run: npm test
       - name: Smoke npm bin wrapper
         run: node bin/kotoba-office.js

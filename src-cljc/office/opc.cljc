@@ -7,6 +7,11 @@
 (def office-part-pattern
   #"^(ppt/slides/slide\d+|xl/worksheets/sheet\d+|word/document)\.xml$")
 
+(defn- part-sort-key [path]
+  (if-let [[_ prefix n] (re-matches #"^(ppt/slides/slide|xl/worksheets/sheet)(\d+)\.xml$" path)]
+    [prefix (count n) n]
+    [path 0]))
+
 (defn package-kind [entries]
   (cond
     (some #(str/starts-with? % "ppt/") (keys entries)) :pptx
@@ -72,8 +77,9 @@
        (with-open [zip (ZipOutputStream. out)]
          (doseq [path paths]
            (.putNextEntry zip (ZipEntry. path))
-           (if-let [text (get entries path)]
-             (.write zip (.getBytes (str text) "UTF-8"))
+           (if (contains? entries path)
+             (let [text (get entries path)]
+               (.write zip (.getBytes (str text) "UTF-8")))
              (.write zip ^bytes (get raw path)))
            (.closeEntry zip)))
        (.toByteArray out))))
@@ -84,5 +90,5 @@
        (map (fn [[path xml]]
               {:office/path path
                :office/xml xml}))
-       (sort-by :office/path)
+       (sort-by (comp part-sort-key :office/path))
        vec))

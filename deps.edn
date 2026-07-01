@@ -1,5 +1,7 @@
 {:paths ["src-cljc"]
- :deps {}
+ :deps {io.github.kotoba-lang/ooxml
+        {:git/url "https://github.com/kotoba-lang/ooxml.git"
+         :git/sha "4b87825e63ecc78bf97f26d98ff87c8bac7a26cd"}}
  :aliases
  {:cli {:main-opts ["-m" "office.cli"]}
   :test {:extra-paths ["test"]

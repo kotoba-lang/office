@@ -1,18 +1,16 @@
 (ns office.embed
   "Non-destructive EDN graph embedding for OOXML packages."
   (:require [clojure.edn :as edn]
-            [clojure.string :as str]
             [office.graph :as graph]
-            [office.opc :as opc]))
+            [office.opc :as opc]
+            [ooxml.core :as ooxml]))
 
 (def payload-part "ocz/causal.edn")
 (def payload-version 1)
-
-(defn- attr-present? [xml k v]
-  (boolean
-   (re-find (re-pattern (str "\\b" k "=(['\"])" #?(:clj (java.util.regex.Pattern/quote v)
-                                                   :cljs v) "\\1"))
-            (or xml ""))))
+(def payload-relationship
+  (ooxml/relationship {:id "rIdKotobaOffice"
+                       :type "https://kotoba-lang.org/office/relationship/causal-edn"
+                       :target payload-part}))
 
 (defn payload [g]
   {:office/version payload-version
@@ -20,38 +18,10 @@
    :office/graph g})
 
 (defn- ensure-content-type [xml]
-  (cond
-    (str/blank? (or xml ""))
-    "<Types><Default Extension=\"edn\" ContentType=\"application/edn\"/></Types>"
-
-    (attr-present? xml "Extension" "edn") xml
-    (re-find #"<Types\b([^>]*)/>" (or xml ""))
-    (str/replace xml #"<Types\b([^>]*)/>"
-                 "<Types$1><Default Extension=\"edn\" ContentType=\"application/edn\"/></Types>")
-    (str/includes? (or xml "") "</Types>")
-    (str/replace xml #"</Types>\s*$"
-                 "<Default Extension=\"edn\" ContentType=\"application/edn\"/></Types>")
-    :else xml))
+  (ooxml/ensure-content-type-extension xml "edn" "application/edn"))
 
 (defn- ensure-root-rels [xml]
-  (cond
-    (str/blank? (or xml ""))
-    (str "<Relationships><Relationship Id=\"rIdKotobaOffice\" "
-         "Type=\"https://kotoba-lang.org/office/relationship/causal-edn\" "
-         "Target=\"" payload-part "\"/></Relationships>")
-
-    (attr-present? xml "Id" "rIdKotobaOffice") xml
-    (re-find #"<Relationships\b([^>]*)/>" (or xml ""))
-    (str/replace xml #"<Relationships\b([^>]*)/>"
-                 (str "<Relationships$1><Relationship Id=\"rIdKotobaOffice\" "
-                      "Type=\"https://kotoba-lang.org/office/relationship/causal-edn\" "
-                      "Target=\"" payload-part "\"/></Relationships>"))
-    (str/includes? (or xml "") "</Relationships>")
-    (str/replace xml #"</Relationships>\s*$"
-                 (str "<Relationship Id=\"rIdKotobaOffice\" "
-                      "Type=\"https://kotoba-lang.org/office/relationship/causal-edn\" "
-                      "Target=\"" payload-part "\"/></Relationships>"))
-    :else xml))
+  (ooxml/ensure-root-relationship xml payload-relationship))
 
 (defn embed-graph
   "Returns a package with graph payload embedded as ocz/causal.edn."

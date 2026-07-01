@@ -1,23 +1,14 @@
 (ns office.opc
   "Small JVM-backed OPC reader for OOXML packages."
-  (:require [clojure.string :as str])
+  (:require [clojure.string :as str]
+            [ooxml.core :as ooxml])
   #?(:clj (:import [java.io ByteArrayInputStream ByteArrayOutputStream]
                    [java.util.zip ZipEntry ZipInputStream ZipOutputStream])))
 
-(def office-part-pattern
-  #"^(ppt/slides/slide\d+|xl/worksheets/sheet\d+|word/document)\.xml$")
-
-(defn- part-sort-key [path]
-  (if-let [[_ prefix n] (re-matches #"^(ppt/slides/slide|xl/worksheets/sheet)(\d+)\.xml$" path)]
-    [prefix (count n) n]
-    [path 0]))
+(def office-part-pattern ooxml/office-part-pattern)
 
 (defn package-kind [entries]
-  (cond
-    (some #(str/starts-with? % "ppt/") (keys entries)) :pptx
-    (some #(str/starts-with? % "xl/") (keys entries)) :xlsx
-    (some #(str/starts-with? % "word/") (keys entries)) :docx
-    :else :opc))
+  (ooxml/package-kind entries))
 
 #?(:clj
    (defn- read-entry [^ZipInputStream zip]
@@ -85,10 +76,7 @@
        (.toByteArray out))))
 
 (defn office-parts [pkg]
-  (->> (:office/entries pkg)
-       (filter (fn [[path _]] (re-matches office-part-pattern path)))
-       (map (fn [[path xml]]
-              {:office/path path
-               :office/xml xml}))
-       (sort-by (comp part-sort-key :office/path))
-       vec))
+  (mapv (fn [[path xml]]
+          {:office/path path
+           :office/xml xml})
+        (ooxml/office-parts (:office/entries pkg))))

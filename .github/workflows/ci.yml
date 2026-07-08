@@ -25,5 +25,7 @@ jobs:
         run: clojure -X:test
       - name: Test npm package script
         run: npm test
+      - name: Install npm dependencies (nbb, for the bin wrapper)
+        run: npm install
       - name: Smoke npm bin wrapper
-        run: node bin/kotoba-office.js
+        run: npx nbb bin/kotoba-office.cljs

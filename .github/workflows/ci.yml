@@ -23,6 +23,8 @@ jobs:
           node-version: 20
       - name: Test CLJC
         run: clojure -X:test
+      - name: Lint
+        run: clojure -M:lint
       - name: Test npm package script
         run: npm test
       - name: Install npm dependencies (nbb, for the bin wrapper)

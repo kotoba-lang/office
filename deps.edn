@@ -1,5 +1,10 @@
 {:paths ["src-cljc"]
- :deps {io.github.kotoba-lang/ooxml
+ :deps {
+        ;; kotoba.lang.text, not clojure.string. Pinned as an explicit floor:
+        ;; tools.deps takes the NEWEST sha it is shown, so without a floor here
+        ;; this repo silently rides whatever a sibling happens to name.
+        io.github.kotoba-lang/text {:git/sha "73bdb13ae7a3d004b44bca08be03a3191157a38f"}
+       io.github.kotoba-lang/ooxml
         {:git/url "https://github.com/kotoba-lang/ooxml.git"
          :git/sha "4b87825e63ecc78bf97f26d98ff87c8bac7a26cd"}}
  :aliases

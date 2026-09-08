@@ -1,6 +1,6 @@
 (ns office.export
   "Graph export helpers."
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (defn- xml-esc [x]
   (-> (str (or x ""))

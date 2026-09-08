@@ -1,6 +1,6 @@
 (ns office.opc
   "Small JVM-backed OPC reader for OOXML packages."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [ooxml.core :as ooxml])
   #?(:clj (:import [java.io ByteArrayInputStream ByteArrayOutputStream]
                    [java.util.zip ZipEntry ZipInputStream ZipOutputStream])))

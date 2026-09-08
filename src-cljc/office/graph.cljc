@@ -1,6 +1,6 @@
 (ns office.graph
   "OOXML package to portable EDN graph."
-  (:require [clojure.string :as str]
+  (:require [kotoba.lang.text :as str]
             [office.opc :as opc]))
 
 (defn- node [id kind label attrs]

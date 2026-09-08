@@ -1,6 +1,6 @@
 (ns office.visual
   "Small SVG renderers for CLJC graph inspection."
-  (:require [clojure.string :as str]))
+  (:require [kotoba.lang.text :as str]))
 
 (defn- esc [x]
   (-> (str (or x ""))

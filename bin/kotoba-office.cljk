@@ -1,4 +1,4 @@
-#!/usr/bin/env nbb
+#!/usr/bin/env kbb
 (ns kotoba-office-bin
   (:require ["node:child_process" :refer [spawnSync]]
             ["node:path" :as path]))

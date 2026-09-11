@@ -30,4 +30,4 @@ jobs:
       - name: Install npm dependencies (nbb, for the bin wrapper)
         run: npm install
       - name: Smoke npm bin wrapper
-        run: npx nbb bin/kotoba-office.cljs
+        run: npx nbb bin/kotoba-office.cljk

@@ -26,7 +26,7 @@
 
 (deftest package-bin-points-to-cljs-wrapper
   (let [package-json (slurp "package.json")
-        bin (java.io.File. "bin/kotoba-office.cljs")]
+        bin (java.io.File. "bin/kotoba-office.cljk")]
     (is (re-find #"\"kotoba-office\"\s*:\s*\"bin/kotoba-office\.cljs\"" package-json))
     (is (not (re-find #"bin/kotoba-office\.js" package-json)))
     (is (.exists bin))

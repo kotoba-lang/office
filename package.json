@@ -16,6 +16,6 @@
     "README.md"
   ],
   "scripts": {
-    "test": "clojure -X:test"
+    "test": "kbb -X:test"
   }
 }

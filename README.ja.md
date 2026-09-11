@@ -36,5 +36,5 @@ portable な EDN graph に抽出します。抽出した graph は既存 Office 
 ## Test
 
 ```bash
-clojure -X:test
+kbb -X:test
 ```

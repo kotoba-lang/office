@@ -60,10 +60,10 @@ The CLI works directly with Clojure or through the npm wrapper. In both cases
 `clojure` must be installed on the host.
 
 ```bash
-clojure -M:cli read deck.pptx
-clojure -M:cli graph deck.pptx dot
-clojure -M:cli embed deck.pptx deck.ocz.pptx
-clojure -M:cli svg deck.pptx graph.svg
+kbb -M:cli read deck.pptx
+kbb -M:cli graph deck.pptx dot
+kbb -M:cli embed deck.pptx deck.ocz.pptx
+kbb -M:cli svg deck.pptx graph.svg
 
 npx @kotoba-lang/office read deck.pptx
 ```
@@ -71,7 +71,7 @@ npx @kotoba-lang/office read deck.pptx
 ## Test
 
 ```bash
-clojure -X:test
+kbb -X:test
 ```
 
 The test suite covers package kind detection, pptx/xlsx/docx text extraction,

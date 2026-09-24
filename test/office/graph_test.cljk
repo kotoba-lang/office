@@ -1,5 +1,5 @@
 (ns office.graph-test
-  (:require [kotoba.test :refer [deftest is]]
+  (:require [kotoba.bytes :as kbytes] [kotoba.test :refer [deftest is]]
             [office.embed :as embed]
             [office.export :as export]
             [office.graph :as graph]
@@ -13,7 +13,7 @@
     (with-open [zip (ZipOutputStream. out)]
       (doseq [[path text] entries]
         (.putNextEntry zip (ZipEntry. path))
-        (.write zip (.getBytes text "UTF-8"))
+        (.write zip (kbytes/utf8-bytes text))
         (.closeEntry zip)))
     (.toByteArray out)))
 
@@ -168,7 +168,7 @@
         roundtrip (opc/open-package (opc/package-bytes pkg))]
     (is (= "<p:sld><a:t>New</a:t></p:sld>"
            (get-in roundtrip [:office/entries "ppt/slides/slide1.xml"])))
-    (is (= (vec (.getBytes "raw-binary" "UTF-8"))
+    (is (= (vec (kbytes/utf8-bytes "raw-binary"))
            (vec (get-in roundtrip [:office/raw "ppt/media/image1.bin"]))))))
 
 (deftest package-roundtrip-preserves-empty-text-entries

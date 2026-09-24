@@ -1,6 +1,6 @@
 (ns office.embed
   "Non-destructive EDN graph embedding for OOXML packages."
-  (:require [clojure.edn :as edn]
+  (:require [kotoba.lang.edn :as edn]
             [office.graph :as graph]
             [office.opc :as opc]
             [ooxml.core :as ooxml]))

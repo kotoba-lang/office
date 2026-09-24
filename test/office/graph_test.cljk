@@ -1,5 +1,5 @@
 (ns office.graph-test
-  (:require [clojure.test :refer [deftest is]]
+  (:require [kotoba.test :refer [deftest is]]
             [office.embed :as embed]
             [office.export :as export]
             [office.graph :as graph]

@@ -1,6 +1,6 @@
 (ns office.cli-test
   (:require [clojure.edn :as edn]
-            [clojure.test :refer [deftest is]]
+            [kotoba.test :refer [deftest is]]
             [office.cli :as cli]
             [office.embed :as embed]
             [office.opc :as opc])

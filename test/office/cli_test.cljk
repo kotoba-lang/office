@@ -1,5 +1,5 @@
 (ns office.cli-test
-  (:require [kotoba.bytes :as kbytes] [kotoba.lang.edn :as edn]
+  (:require [kotoba.lang.error :as kerror] [kotoba.bytes :as kbytes] [kotoba.lang.edn :as edn]
             [kotoba.test :refer [deftest is]]
             [office.cli :as cli]
             [office.embed :as embed]
@@ -35,7 +35,7 @@
 (deftest require-file-validates-required-path
   (let [require-file-fn (ns-resolve 'office.cli 'require-file)]
     (is (= "deck.pptx" (@require-file-fn "deck.pptx")))
-    (is (thrown-with-msg? clojure.lang.ExceptionInfo
+    (is (thrown-with-msg? kerror/ExceptionInfo
                           #"office cli"
                           (@require-file-fn nil)))))
 

@@ -1,6 +1,6 @@
 (ns office.opc
   "Small JVM-backed OPC reader for OOXML packages."
-  (:require [kotoba.lang.text :as str]
+  (:require [kotoba.bytes :as kbytes] [kotoba.lang.text :as str]
             [ooxml.core :as ooxml])
   #?(:clj (:import [java.io ByteArrayInputStream ByteArrayOutputStream]
                    [java.util.zip ZipEntry ZipInputStream ZipOutputStream])))
@@ -47,7 +47,7 @@
                            (str/ends-with? name ".json")
                            (str/ends-with? name ".jsonl"))]
              (recur (if text?
-                      (assoc entries name (String. entry-bytes "UTF-8"))
+                      (assoc entries name (kbytes/utf8-string entry-bytes))
                       entries)
                     (assoc raw name entry-bytes)))
            {:office/kind (package-kind entries)
@@ -70,7 +70,7 @@
            (.putNextEntry zip (ZipEntry. path))
            (if (contains? entries path)
              (let [text (get entries path)]
-               (.write zip (.getBytes (str text) "UTF-8")))
+               (.write zip (kbytes/utf8-bytes (str text))))
              (.write zip ^bytes (get raw path)))
            (.closeEntry zip)))
        (.toByteArray out))))
